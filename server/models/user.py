@@ -2,7 +2,7 @@ from database import Base
 from sqlalchemy.sql import func
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
 from utils import constants
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, UUID4
 
 
 class User(Base):
@@ -13,7 +13,7 @@ class User(Base):
     email = Column(String(50), nullable=False, unique=True, index=True)
     password = Column(String(255), nullable=False)
     is_confirmed = Column(Boolean, default=True)
-    role = Column(String(10), default=constants.USER_ROLE)
+    role = Column(String(10), default=constants.USER_ROLE)  # roles
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 
@@ -29,12 +29,16 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: UUID4
     password: str = Field(min_length=8)
     confirm_password: str = Field(min_length=8)
 
     class Config:
         json_schema_extra = {
             "example": {
+                "email": "johndoe@syntaxsaga.dev",
+                "code": "some random code value",
                 "password": "Password123",
                 "confirm_password": "Password123"
             }
