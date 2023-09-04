@@ -43,3 +43,31 @@ class ResetPasswordRequest(BaseModel):
                 "confirm_password": "Password123"
             }
         }
+
+
+class RegisterUserRequest(BaseModel):
+    name: str = Field(max_length=50)
+    email: EmailStr
+    password: str = Field(min_length=8)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "John Doe",
+                "email": "johndoe@syntaxsaga.dev",
+                "password": "Password123",
+            }
+        }
+
+
+class LoginUserRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "johndoe@syntaxsaga.dev",
+                "password": "Password123",
+            }
+        }

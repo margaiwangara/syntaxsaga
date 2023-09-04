@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from models.connect import DB_DEPENDENCY
-from models.user import ForgotPasswordRequest, ResetPasswordRequest, User
+from models.user import ForgotPasswordRequest, ResetPasswordRequest, RegisterUserRequest, LoginUserRequest, User
 from starlette import status
 from utils.email import send_email
 from config import settings
 from uuid import uuid4
 from lib.auth import check_email_exists
+from utils import constants
+from argon2 import PasswordHasher
 
 import redis
-import json
 
 router = APIRouter(
     tags=["Authentication and Authorization"],
@@ -20,15 +21,42 @@ r = redis.Redis(
     port=settings.REDIS_PORT
 )
 
-
-@router.post("/register")
-def register_user():
-    return {"message": "Register"}
+argon2_hasher = PasswordHasher()
 
 
-@router.post("/login")
-def login_user():
-    return {"message": "Login"}
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+def register_user(user: RegisterUserRequest, db: DB_DEPENDENCY):
+    # check if email exists
+    email_exists = db.query(User).filter(User.email == user.email).first()
+
+    if email_exists is not None:
+        raise HTTPException(400, "Email already exists")
+
+    # register user
+    hashed_password = argon2_hasher.hash(user.password)
+    new_user = User(
+        name=user.name,
+        email=user.email,
+        password=hashed_password,
+        is_confirmed=False,
+        role=constants.USER_ROLE
+    )
+
+    db.add(new_user)
+    db.commit()
+
+
+@router.post("/login", status_code=status.HTTP_200_OK)
+def login_user(user: LoginUserRequest, db: DB_DEPENDENCY):
+    # check if user exists
+    current_user = db.query(User).filter(User.email == user.email).first()
+
+    if not user:
+        raise HTTPException(401, "Invalid email or password")
+
+    if not argon2_hasher.verify(current_user.password, user.password):
+        raise HTTPException(401, "Invalid email or password")
+    return current_user
 
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
