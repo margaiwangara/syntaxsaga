@@ -11,6 +11,7 @@ pydantic-settings = "*"
 mysql-connector-python = "*"
 pydantic = {version = "*", extras = ["email"]}
 requests = "*"
+redis = "*"
 
 [dev-packages]
 

@@ -11,11 +11,12 @@ def send_email(to: str, subject: str, message: str):
                 "from": settings.MG_SEND_EMAIL_FROM,
                 "to": [to],
                 "subject": subject,
-                "text": message
+                "html": message
             }
         )
-        print(send.status_code)  # print message here
-        return True
+        if send.status_code == 200:
+            return True
+        return False
     except Exception as err:
         print(err)
         return False
