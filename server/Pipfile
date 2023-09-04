@@ -8,6 +8,7 @@ fastapi = "*"
 uvicorn = {version = "*", extras = ["standard"]}
 sqlalchemy = "*"
 pydantic-settings = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 

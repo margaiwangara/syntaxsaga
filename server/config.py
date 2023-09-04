@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    MYSQL_HOST = "localhost"
+    MYSQL_HOST: str = "localhost"
     MYSQL_USER: str
     MYSQL_PASSWORD: str
     MYSQL_DB: str

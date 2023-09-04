@@ -5,7 +5,7 @@ from sqlalchemy import URL
 from config import settings
 
 url_object = URL.create(
-    "mysql",
+    "mysql+mysqlconnector",
     username=settings.MYSQL_USER,
     password=settings.MYSQL_PASSWORD,
     host=settings.MYSQL_HOST,
