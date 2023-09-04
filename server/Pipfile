@@ -9,6 +9,8 @@ uvicorn = {version = "*", extras = ["standard"]}
 sqlalchemy = "*"
 pydantic-settings = "*"
 mysql-connector-python = "*"
+pydantic = {version = "*", extras = ["email"]}
+requests = "*"
 
 [dev-packages]
 
