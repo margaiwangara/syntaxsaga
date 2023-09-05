@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Response
 from models.connect import DB_DEPENDENCY
 from models.user import ForgotPasswordRequest, ResetPasswordRequest, RegisterUserRequest, LoginUserRequest, User
 from starlette import status
@@ -8,6 +8,8 @@ from uuid import uuid4
 from lib.auth import check_email_exists
 from utils import constants
 from argon2 import PasswordHasher
+from utils.auth import generate_access_token, get_current_user
+from datetime import timedelta, datetime
 
 import redis
 
@@ -25,7 +27,7 @@ argon2_hasher = PasswordHasher()
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register_user(user: RegisterUserRequest, db: DB_DEPENDENCY):
+def register_user(response: Response, user: RegisterUserRequest, db: DB_DEPENDENCY):
     # check if email exists
     email_exists = db.query(User).filter(User.email == user.email).first()
 
@@ -45,18 +47,39 @@ def register_user(user: RegisterUserRequest, db: DB_DEPENDENCY):
     db.add(new_user)
     db.commit()
 
+    # generate and add token to cookie as http for auth
+    cookie_expire = datetime.now() + timedelta(weeks=1)
+    token = generate_access_token(new_user.id, new_user.email, new_user.role,
+                                  new_user.is_confirmed, timedelta(weeks=1))
+    response.set_cookie(constants.ACCESS_TOKEN, token, httponly=True,
+                        expires=cookie_expire.strftime("%a, %d %b %Y %H:%M:%S GMT"))
+
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-def login_user(user: LoginUserRequest, db: DB_DEPENDENCY):
+def login_user(response: Response, user: LoginUserRequest, db: DB_DEPENDENCY):
     # check if user exists
     current_user = db.query(User).filter(User.email == user.email).first()
 
-    if not user:
+    if not current_user:
         raise HTTPException(401, "Invalid email or password")
 
     if not argon2_hasher.verify(current_user.password, user.password):
         raise HTTPException(401, "Invalid email or password")
-    return current_user
+
+    # generate token and add to cookie
+    cookie_expire = datetime.now() + timedelta(weeks=1)
+    token = generate_access_token(current_user.id, current_user.email, current_user.role,
+                                  current_user.is_confirmed, timedelta(weeks=1))
+    response.set_cookie(constants.ACCESS_TOKEN, token, httponly=True,
+                        expires=cookie_expire.strftime("%a, %d %b %Y %H:%M:%S GMT"))
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "role": current_user.role,
+        "is_confirmed": current_user.is_confirmed,
+        "created_at": current_user.created_at
+    }
 
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
