@@ -91,6 +91,12 @@ def get_current_user(request: Request, db: DB_DEPENDENCY):
     return auth.return_user_data(user)
 
 
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout_user(response: Response):
+    # access then delete token
+    response.delete_cookie(constants.ACCESS_TOKEN)
+
+
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
 # takes in an email address and send reset password email
 def forgot_user_password(input: ForgotPasswordRequest, db: DB_DEPENDENCY, background_tasks: BackgroundTasks):
