@@ -18,7 +18,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <main>
           <NavBar />
-          <section>{children}</section>
+          <section className="container">{children}</section>
         </main>
       </body>
     </html>

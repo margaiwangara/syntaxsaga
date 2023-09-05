@@ -1,4 +1,7 @@
+'use client';
+
 import { useState } from 'react';
+import Link from 'next/link';
 
 type AuthFormProps = {
   page?: 'register' | 'login' | 'forgot-password' | 'reset-password';
@@ -16,11 +19,14 @@ export default function AuthForm({ page = 'register' }: AuthFormProps) {
     setValues({ ...values, [e.target.name]: e.target.value });
 
   return (
-    <div className="card">
+    <div className="card mt-5">
+      <div className="card-header text-capitalize font-weight-bold">
+        {page?.split('-').join(' ')}
+      </div>
       <div className="card-body">
         <form action="#" method="POST">
           {page === 'register' && (
-            <div className="form-group">
+            <div className="form-group mb-2">
               <label htmlFor="name-field" className="form-label">
                 Name
               </label>
@@ -35,7 +41,7 @@ export default function AuthForm({ page = 'register' }: AuthFormProps) {
             </div>
           )}
           {page !== 'reset-password' && (
-            <div className="form-group">
+            <div className="form-group mb-2">
               <label htmlFor="email-field" className="form-label">
                 Email address
               </label>
@@ -49,21 +55,23 @@ export default function AuthForm({ page = 'register' }: AuthFormProps) {
               />
             </div>
           )}
-          <div className="form-group">
-            <label htmlFor="password-field" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              className="form-control"
-              name="password"
-              id="password-field"
-              value={values.password}
-              onChange={onChange}
-            />
-          </div>
+          {page !== 'forgot-password' && (
+            <div className="form-group mb-2">
+              <label htmlFor="password-field" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                id="password-field"
+                value={values.password}
+                onChange={onChange}
+              />
+            </div>
+          )}
           {page === 'reset-password' && (
-            <div className="form-group">
+            <div className="form-group mb-2">
               <label htmlFor="password-field" className="form-label">
                 Confirm Password
               </label>
@@ -77,7 +85,25 @@ export default function AuthForm({ page = 'register' }: AuthFormProps) {
               />
             </div>
           )}
-          <button className="btn btn-primary mt-2 text-capitalize">
+          <div className="mb-2 d-flex justify-content-between">
+            {page === 'login' && (
+              <>
+                <small className="text-secondary">
+                  Not a member? <Link href="/access/register">Register</Link>
+                </small>
+                <small className="text-secondary">
+                  <Link href="/access/forgot-password">Forgot Password?</Link>
+                </small>
+              </>
+            )}
+
+            {page === 'register' && (
+              <small className="text-secondary">
+                Already a member? <Link href="/access/login">Login</Link>
+              </small>
+            )}
+          </div>
+          <button className="btn btn-primary text-capitalize">
             {page?.split('-').join(' ')}
           </button>
         </form>

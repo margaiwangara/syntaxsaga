@@ -34,7 +34,7 @@ export default function NavBar() {
           </li>
           <li className="nav-item">
             <Link
-              href="/access/login"
+              href="/access/register"
               className={`nav-link${
                 pathname === '/access/register' ? ' active' : ''
               }`}
