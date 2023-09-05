@@ -5,10 +5,10 @@ export function getNavLinkClass(pathName: string) {
     case '/':
       navLink += ' active';
       break;
-    case '/access/login':
+    case '/login':
       navLink += ' active';
       break;
-    case '/access/register':
+    case '/register':
       navLink += ' active';
       break;
     default:

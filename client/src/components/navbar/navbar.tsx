@@ -24,20 +24,16 @@ export default function NavBar() {
         <ul className="navbar-nav">
           <li className="nav-item">
             <Link
-              href="/access/login"
-              className={`nav-link${
-                pathname === '/access/login' ? ' active' : ''
-              }`}
+              href="/login"
+              className={`nav-link${pathname === '/login' ? ' active' : ''}`}
             >
               Login
             </Link>
           </li>
           <li className="nav-item">
             <Link
-              href="/access/register"
-              className={`nav-link${
-                pathname === '/access/register' ? ' active' : ''
-              }`}
+              href="/register"
+              className={`nav-link${pathname === '/register' ? ' active' : ''}`}
             >
               Register
             </Link>

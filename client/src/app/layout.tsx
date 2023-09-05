@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 import NavBar from '@components/navbar';
+import Provider from '@react-query/provider';
 
 export const metadata: Metadata = {
   title: 'SyntaxSaga',
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <main>
           <NavBar />
-          <section className="container">{children}</section>
+          <section className="container">
+            <Provider>{children}</Provider>
+          </section>
         </main>
       </body>
     </html>

@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -89,17 +88,17 @@ export default function AuthForm({ page = 'register' }: AuthFormProps) {
             {page === 'login' && (
               <>
                 <small className="text-secondary">
-                  Not a member? <Link href="/access/register">Register</Link>
+                  Not a member? <Link href="/register">Register</Link>
                 </small>
                 <small className="text-secondary">
-                  <Link href="/access/forgot-password">Forgot Password?</Link>
+                  <Link href="/forgot-password">Forgot Password?</Link>
                 </small>
               </>
             )}
 
             {page === 'register' && (
               <small className="text-secondary">
-                Already a member? <Link href="/access/login">Login</Link>
+                Already a member? <Link href="/login">Login</Link>
               </small>
             )}
           </div>
