@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Response
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Response, Request
 from models.connect import DB_DEPENDENCY
 from models.user import ForgotPasswordRequest, ResetPasswordRequest, RegisterUserRequest, LoginUserRequest, User
 from starlette import status
 from utils.email import send_email
 from config import settings
 from uuid import uuid4
-from lib.auth import check_email_exists
-from utils import constants
+from lib.auth import check_email_exists, generate_access_token, current_user
+from utils import constants, auth
 from argon2 import PasswordHasher
-from utils.auth import generate_access_token, get_current_user
 from datetime import timedelta, datetime
+
 
 import redis
 
@@ -72,14 +72,23 @@ def login_user(response: Response, user: LoginUserRequest, db: DB_DEPENDENCY):
                                   current_user.is_confirmed, timedelta(weeks=1))
     response.set_cookie(constants.ACCESS_TOKEN, token, httponly=True,
                         expires=cookie_expire.strftime("%a, %d %b %Y %H:%M:%S GMT"))
-    return {
-        "id": current_user.id,
-        "name": current_user.name,
-        "email": current_user.email,
-        "role": current_user.role,
-        "is_confirmed": current_user.is_confirmed,
-        "created_at": current_user.created_at
-    }
+    return auth.return_user_data(current_user)
+
+
+@router.get("/current-user", status_code=status.HTTP_200_OK)
+def get_current_user(request: Request, db: DB_DEPENDENCY):
+    token = request.cookies.get(constants.ACCESS_TOKEN)
+
+    if token is None:
+        raise HTTPException(401, "Unauthorized access")
+
+    user_from_token = current_user(token)
+    user = db.query(User).filter(User.id == user_from_token.get("id")).first()
+
+    if user is None:
+        raise HTTPException(401, "Unauthorized access")
+
+    return auth.return_user_data(user)
 
 
 @router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
