@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Toaster } from 'react-hot-toast';
 
 import NavBar from '@components/navbar';
 import Provider from '@react-query/provider';
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <main>
           <NavBar />
+          <Toaster position="top-right" />
           <section className="container">
             <Provider>{children}</Provider>
           </section>

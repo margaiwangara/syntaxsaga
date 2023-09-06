@@ -1,6 +1,6 @@
 import axios, { Method, AxiosRequestConfig } from 'axios';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000/api';
 
 export function apiRequest(
   method: Method,
@@ -18,6 +18,6 @@ export function apiRequest(
       ...config,
     })
       .then((res) => resolve(res.data))
-      .catch((error) => reject(error?.data));
+      .catch((error) => reject(error?.response?.data));
   });
 }
